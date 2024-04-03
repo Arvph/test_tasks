@@ -1,0 +1,154 @@
+openapi: 3.0.0
+info: 
+  title: Tasks service
+  version: 0.0.1
+servers:
+  - url: http://localhost:8088/api/v1/
+    description: Dev server
+paths:
+  /tasks:
+    get:
+      summary: Get all tasks
+      tags: 
+        - Tasks
+      operationId: getAllTasks
+      responses:
+        "200":
+          description: succeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tasks"
+        'default':
+          description: everything other
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post: 
+      summary: Create a new task
+      tags: 
+        - Tasks
+      operationId: createTask
+      requestBody:
+        required: true 
+        content: 
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+      responses:
+        "200":
+          description: succeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        'default':
+          description: everything other
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+            
+  /tasks/{id}:
+    get:
+      summary: Get task by Id
+      tags: 
+        - Tasks
+      operationId: getTaskById
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: task identifier
+          schema:
+            type: string
+      responses:
+        "200":
+          description: succeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        'default':
+          description: everything other
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete task by Id
+      tags: 
+        - Tasks
+      operationId: deleteTaskById
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: task identifier
+          schema:
+            type: string
+      responses:
+        "200":
+          description: succeded
+          content:
+            application/json: {}
+        'default':
+          description: everything other
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      
+
+components:
+  schemas:
+    Task:
+      type: object
+      required: 
+        - name
+        - status
+      properties:
+        id:
+          type: integer
+          example: 7
+        user_id:
+          type: integer
+          example: 123456
+        text:
+          type: string
+          example: My first task
+        created_at:
+          type: string
+          example: 2022-07-01T15:00:00+01
+        status:
+          type: string
+          enum:
+            - new
+            - in proccess
+            - done
+          description: Tasks status
+    Tasks:
+      type: array
+      items:
+        $ref: "#/components/schemas/Task"
+    Error:   
+      type: object
+      required: 
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+        
+
+
+
+
+
+
+
+
+      
