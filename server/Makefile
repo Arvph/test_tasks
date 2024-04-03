@@ -1,6 +1,6 @@
 include .env
 
-.PHONY: all db_up db_create
+.PHONY: all db_create db_up db_drop docker_volume migrate_app migrate_create migrate_up migrate_down install-golangci-lint lint
 
 LOCAL_BIN=$(CURDIR)/bin
 SWAG_PATH=$(CURDIR)/report
@@ -16,14 +16,14 @@ db_create:
 	docker pull postgres:$(PG_V)
 
 db_up: docker_volume
-	docker run --name $(DB_NAME) -p $(DB_PORT):$(CONTAINER_PORT) -e POSTGRES_DB=$(DB_NAME) -e POSTGRES_USER=$(DB_USER) -e POSTGRES_PASSWORD=$(DB_PASSWORD) -v noteDB:$(DB_VOLUME) -d postgres:$(PG_V)
+	docker run --name $(DB_NAME) -p $(DB_PORT):$(CONTAINER_PORT) -e POSTGRES_DB=$(DB_NAME) -e POSTGRES_USER=$(DB_USER) -e POSTGRES_PASSWORD=$(DB_PASSWORD) -v taskDB:$(DB_VOLUME) -d postgres:$(PG_V)
 
 db_drop:
 	docker kill $(DB_NAME)
 	docker rm $(DB_NAME)
 
 docker_volume:
-	docker volume create node_data
+	docker volume create tasks_data
 
 migrate_app:
 	GOBIN=$(LOCAL_BIN) go install github.com/pressly/goose/v3/cmd/goose@v3.19.1
@@ -36,9 +36,6 @@ migrate_up:
 
 migrate_down:
 	$(LOCAL_BIN)/goose -dir $(MIGRATION_PATH) postgres $(LOCAL_MIGRATION_DSN) down -v
-
-swagger:
-	swag init -o $(SWAG_PATH)
 
 install-golangci-lint:
 	GOBIN=$(LOCAL_BIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.3
